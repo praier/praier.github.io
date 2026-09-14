@@ -28,7 +28,19 @@
 <p class="eyebrow">랜덤 도구</p><h1>온라인 동전 던지기</h1>
 <p class="lead">두 가지 선택지 중 하나를 빠르게 정해야 할 때 동전 던지기처럼 간단하게 사용할 수 있습니다.</p>
 <div class="tool-box">
-<div class="coin-stage"><div id="coinHand" class="coin-hand">🤏</div><div id="coinVisual" class="coin-visual final-heads">🪙</div></div><div class="result"><div id="coinResult" class="result-value">결과 대기</div><button class="btn" id="flipCoin">동전 던지기</button></div>
+<div class="coin-stage" aria-live="polite">
+  <div class="coin-hand-scene">
+    <div id="coinHand" class="coin-hand">
+      <div class="palm">🖐️</div>
+      <div class="flick-finger">☝️</div>
+    </div>
+    <div id="coinVisual" class="coin-visual show-heads" aria-label="동전">
+      <div class="coin-face coin-heads"><span>앞</span><b>★</b></div>
+      <div class="coin-face coin-tails"><span>뒤</span><b>2</b></div>
+    </div>
+  </div>
+  <div class="coin-instruction">손 위의 동전을 손가락으로 탁! 튕겨보세요.</div>
+</div><div class="result"><div id="coinResult" class="result-value">결과 대기</div><button class="btn" id="flipCoin">동전 던지기</button></div>
 </div>
 <article class="article" style="padding-bottom:0">
 <h2>사용 방법</h2><p>버튼을 누르면 앞면 또는 뒷면 중 하나가 표시됩니다. 메뉴 선택, 게임 시작, 순서 정하기 등 두 가지 선택지가 필요한 상황에서 활용할 수 있습니다.</p>

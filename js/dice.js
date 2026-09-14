@@ -2,53 +2,109 @@
   const countEl = document.getElementById('playerCount');
   const button = document.getElementById('rollDice');
   const board = document.getElementById('diceBoard');
-  if(!button || !board) return;
+  if(!button || !board || !countEl) return;
+
+  const pipMap = {
+    1:[5],
+    2:[1,9],
+    3:[1,5,9],
+    4:[1,3,7,9],
+    5:[1,3,5,7,9],
+    6:[1,3,4,6,7,9]
+  };
+  const faceNames = ['front','bottom','right','left','top','back']; // 1..6
 
   function rand(){ return Math.floor(Math.random()*6)+1; }
+  function pips(n){ return pipMap[n].map(pos=>`<span class="pip pip-${pos}"></span>`).join(''); }
+  function cubeMarkup(){
+    return `<div class="die-cube">
+      <div class="die-face die-front">${pips(1)}</div>
+      <div class="die-face die-back">${pips(6)}</div>
+      <div class="die-face die-right">${pips(3)}</div>
+      <div class="die-face die-left">${pips(4)}</div>
+      <div class="die-face die-top">${pips(5)}</div>
+      <div class="die-face die-bottom">${pips(2)}</div>
+    </div>`;
+  }
 
-  function renderBoard(count, rolling){
-    board.innerHTML = '';
+  function resultTransform(value){
+    // Rotate the physical cube so the requested face is visible from the front.
+    const map = {
+      1:'rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
+      2:'rotateX(90deg) rotateY(0deg) rotateZ(0deg)',
+      3:'rotateX(0deg) rotateY(-90deg) rotateZ(0deg)',
+      4:'rotateX(0deg) rotateY(90deg) rotateZ(0deg)',
+      5:'rotateX(-90deg) rotateY(0deg) rotateZ(0deg)',
+      6:'rotateX(0deg) rotateY(180deg) rotateZ(0deg)'
+    };
+    return map[value];
+  }
+
+  function renderBoard(count){
+    board.innerHTML='';
     for(let i=1;i<=count;i++){
-      const card = document.createElement('div');
-      card.className = 'dice-player-card' + (rolling ? ' is-rolling' : '');
-      card.dataset.player = i;
-      card.innerHTML = `
+      const card=document.createElement('div');
+      card.className='dice-player-card';
+      card.innerHTML=`
+        <div class="dice-result-top" aria-live="polite">?</div>
         <div class="player-name">플레이어 ${i}</div>
-        <div class="dice-stage"><div class="dice-emoji">🎲</div></div>
-        <div class="dice-number">?</div>
-        <div class="dice-state">굴리는 중...</div>`;
+        <div class="dice-stage"><div class="dice-cube-wrap">${cubeMarkup()}</div></div>
+        <div class="dice-state">굴릴 준비 완료</div>`;
       board.appendChild(card);
     }
   }
 
   function showResults(results){
-    const high = Math.max(...results);
-    [...board.children].forEach((card, idx)=>{
-      const value = results[idx];
-      const num = card.querySelector('.dice-number');
-      const state = card.querySelector('.dice-state');
+    const high=Math.max(...results);
+    [...board.children].forEach((card,idx)=>{
+      const value=results[idx];
+      const top=card.querySelector('.dice-result-top');
+      const cube=card.querySelector('.die-cube');
+      const state=card.querySelector('.dice-state');
       card.classList.remove('is-rolling');
       card.classList.add('is-finished');
-      num.textContent = value;
-      state.textContent = value === high ? '🎉 최고 숫자!' : '결과 확인';
-      if(value === high) card.classList.add('is-winner');
+      top.textContent=value;
+      top.classList.add('result-pop');
+      cube.classList.add('dice-final');
+      cube.style.setProperty('--final-transform', resultTransform(value));
+      state.textContent=value===high?'🎉 최고 숫자!':'결과 확인';
+      if(value===high) card.classList.add('is-winner');
+      if(results.length>1) card.querySelector('.player-name').textContent=`플레이어 ${idx+1}`;
     });
+    const winnerText=document.getElementById('diceSummary');
+    if(winnerText){
+      const winners=results.map((v,i)=>v===high?`플레이어 ${i+1}`:null).filter(Boolean);
+      winnerText.textContent=`최고 결과: ${high} · ${winners.join(', ')}`;
+      winnerText.classList.add('summary-show');
+    }
   }
 
-  button.addEventListener('click', ()=>{
-    const count = Number(countEl.value) || 2;
-    const results = Array.from({length:count}, rand);
-    button.disabled = true;
-    button.textContent = '주사위가 구르는 중...';
-    renderBoard(count, true);
-    const duration = 1200;
+  function startRoll(){
+    const count=Math.min(10,Math.max(2,Number(countEl.value)||2));
+    const results=Array.from({length:count},rand);
+    button.disabled=true;
+    button.textContent='주사위를 굴리는 중...';
+    const winnerText=document.getElementById('diceSummary');
+    if(winnerText){ winnerText.textContent='결과 계산 중...'; winnerText.classList.remove('summary-show'); }
+    renderBoard(count);
+    [...board.children].forEach(card=>{
+      card.classList.add('is-rolling');
+      const cube=card.querySelector('.die-cube');
+      const seed=(Math.random()*180)|0;
+      cube.style.setProperty('--spinX', `${540+seed}deg`);
+      cube.style.setProperty('--spinY', `${720+seed*2}deg`);
+      cube.style.setProperty('--spinZ', `${360+(seed%120)}deg`);
+    });
+
+    const duration=1500;
     setTimeout(()=>{
       showResults(results);
-      button.disabled = false;
-      button.textContent = '다시 굴리기';
-    }, duration);
-  });
+      button.disabled=false;
+      button.textContent='🎲 다시 굴리기';
+    },duration);
+  }
 
-  renderBoard(Number(countEl.value)||2, false);
-  countEl.addEventListener('change', ()=>renderBoard(Number(countEl.value)||2, false));
+  button.addEventListener('click',startRoll);
+  countEl.addEventListener('change',()=>renderBoard(Number(countEl.value)||2));
+  renderBoard(Number(countEl.value)||2);
 })();
