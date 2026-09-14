@@ -1,9 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const menuButton = document.querySelector(".menu-button");
-  const navLinks = document.querySelector(".nav-links");
-  if (menuButton && navLinks) {
-    menuButton.addEventListener("click", () => navLinks.classList.toggle("open"));
-  }
-  const year = document.querySelectorAll("[data-year]");
-  year.forEach(el => el.textContent = new Date().getFullYear());
+document.addEventListener('DOMContentLoaded',()=>{
+  const btn=document.querySelector('.menu-button');
+  const nav=document.querySelector('.nav-links');
+  if(btn&&nav) btn.addEventListener('click',()=>nav.classList.toggle('open'));
+  document.querySelectorAll('[data-year]').forEach(el=>el.textContent=new Date().getFullYear());
 });
