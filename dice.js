@@ -1,0 +1,5 @@
+(function(){
+ const button=document.getElementById('flipCoin'), result=document.getElementById('coinResult'), coin=document.getElementById('coinVisual'); if(!button||!result||!coin)return;
+ function flip(){const heads=Math.random()<.5; button.disabled=true; button.textContent='🪙 튕기는 중…'; result.textContent='동전을 던지는 중…'; result.className='result-value coin-result-wait'; coin.classList.remove('coin-toss-heads','coin-toss-tails','coin-land','show-heads','show-tails'); void coin.offsetWidth; coin.classList.add(heads?'coin-toss-heads':'coin-toss-tails'); setTimeout(()=>{coin.classList.remove('coin-toss-heads','coin-toss-tails'); coin.classList.add(heads?'show-heads':'show-tails','coin-land'); result.textContent=heads?'앞면':'뒷면'; result.className='result-value coin-result-show'; button.disabled=false; button.textContent='🪙 다시 던지기';},1800);}
+ button.addEventListener('click',flip);
+})();
