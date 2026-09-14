@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://praier.github.io/sitemap.xml
