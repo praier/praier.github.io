@@ -116,3 +116,82 @@ textarea{min-height:150px;resize:vertical}
   .container{width:min(100% - 22px,1100px)}
   .tool-box,.card,.hero-card{padding:20px}
 }
+
+/* ===== Interactive animation upgrade ===== */
+.dice-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:20px}
+.dice-player-card{padding:18px;border:1px solid #e7e7e7;border-radius:18px;background:#fff;text-align:center;transition:.35s ease;box-shadow:0 8px 24px rgba(0,0,0,.05)}
+.dice-player-card.is-winner{transform:translateY(-5px);box-shadow:0 14px 30px rgba(0,0,0,.11);border-color:#ffd166}
+.player-name{font-weight:700}
+.dice-stage{height:120px;display:grid;place-items:center;perspective:700px}
+.dice-emoji{font-size:74px;line-height:1;filter:drop-shadow(0 12px 8px rgba(0,0,0,.12));transform-style:preserve-3d}
+.is-rolling .dice-emoji{animation:diceRoll 1.05s cubic-bezier(.24,.8,.36,1) infinite}
+.is-finished .dice-emoji{animation:diceSettle .5s ease-out}
+.dice-number{font-size:2rem;font-weight:800;margin-top:4px}
+.dice-state{font-size:.9rem;color:#777;margin-top:4px}
+@keyframes diceRoll{0%{transform:rotateX(0) rotateY(0) rotateZ(0) scale(1)}25%{transform:rotateX(135deg) rotateY(120deg) rotateZ(20deg) scale(1.06)}50%{transform:rotateX(290deg) rotateY(250deg) rotateZ(-16deg) scale(.95)}75%{transform:rotateX(455deg) rotateY(380deg) rotateZ(14deg) scale(1.05)}100%{transform:rotateX(540deg) rotateY(520deg) rotateZ(0) scale(1)}}
+@keyframes diceSettle{0%{transform:rotateX(540deg) rotateY(520deg) scale(.9)}65%{transform:rotateX(560deg) rotateY(535deg) scale(1.08)}100%{transform:rotateX(540deg) rotateY(520deg) scale(1)}}
+
+.coin-stage{position:relative;min-height:350px;display:grid;place-items:center;overflow:hidden;border-radius:20px;background:linear-gradient(180deg,#f9fafb,#eef2f7)}
+.coin-hand{position:absolute;bottom:38px;left:50%;font-size:64px;transform:translateX(-130px);filter:drop-shadow(0 12px 8px rgba(0,0,0,.12));z-index:2}
+.coin-visual{position:relative;width:118px;height:118px;display:grid;place-items:center;border-radius:50%;font-size:66px;z-index:3;filter:drop-shadow(0 18px 12px rgba(0,0,0,.15));transform-style:preserve-3d}
+.coin-flipping{animation:coinFlip 1.45s cubic-bezier(.2,.8,.2,1) forwards}
+.coin-land{animation:coinLand .45s ease-out}
+.hand-flick{animation:handFlick .32s ease-out}
+.coin-result-wait{opacity:.72}
+.coin-result-show{animation:resultPop .45s ease-out}
+@keyframes handFlick{0%{transform:translateX(-130px) translateY(0) rotate(0)}45%{transform:translateX(-150px) translateY(-18px) rotate(-15deg)}100%{transform:translateX(-130px) translateY(0) rotate(0)}}
+@keyframes coinFlip{0%{transform:translate(0,35px) rotateY(0deg) rotateZ(0deg) scale(.92)}15%{transform:translate(20px,-35px) rotateY(540deg) rotateZ(16deg) scale(1)}35%{transform:translate(42px,-112px) rotateY(1260deg) rotateZ(-22deg) scale(1.02)}55%{transform:translate(70px,-150px) rotateY(1980deg) rotateZ(25deg) scale(1.04)}72%{transform:translate(92px,-105px) rotateY(2700deg) rotateZ(-18deg) scale(1.01)}88%{transform:translate(110px,-20px) rotateY(3240deg) rotateZ(10deg) scale(.98)}100%{transform:translate(125px,0) rotateY(3600deg) rotateZ(0) scale(1)}}
+@keyframes coinLand{0%{transform:translate(125px,0) scale(1.08)}65%{transform:translate(125px,8px) scale(.94)}100%{transform:translate(125px,0) scale(1)}}
+
+.lottery-controls{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:12px;align-items:end}
+.stick-board{display:flex;align-items:flex-end;justify-content:center;gap:9px;min-height:270px;padding:28px 12px 12px;overflow-x:auto}
+.lottery-stick{position:relative;width:34px;height:205px;border:0;background:linear-gradient(90deg,#b8743a,#e9ad70 48%,#b06b35);border-radius:12px 12px 6px 6px;cursor:pointer;transform:rotate(var(--tilt));transition:transform .2s,filter .2s;animation:stickDrop .55s ease-out var(--delay) both;box-shadow:inset 2px 0 3px rgba(255,255,255,.25),4px 8px 14px rgba(0,0,0,.1)}
+.lottery-stick:hover:not(:disabled){transform:translateY(-12px) rotate(var(--tilt));filter:brightness(1.05)}
+.stick-top{position:absolute;top:-9px;left:5px;width:24px;height:24px;border-radius:50%;background:#f2c39b;box-shadow:0 3px 6px rgba(0,0,0,.1)}
+.stick-label{position:absolute;top:54%;left:50%;transform:translate(-50%,-50%);font-size:1.15rem;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.stick-number{position:absolute;left:50%;bottom:14px;transform:translate(-50%,20px);opacity:0;font-size:1rem;font-weight:900;color:#5b331c;white-space:nowrap;background:#fff6e9;padding:5px 6px;border-radius:8px}
+.lottery-stick.is-picked{animation:stickPick .72s cubic-bezier(.2,.8,.2,1) forwards}
+.lottery-stick.is-picked .stick-label{opacity:0}
+.lottery-stick.is-picked .stick-number{animation:numberReveal .5s .3s ease-out forwards}
+.lottery-stick.is-other{opacity:.42;transform:scale(.96) rotate(var(--tilt))}
+@keyframes stickDrop{0%{opacity:0;transform:translateY(-40px) rotate(var(--tilt))}100%{opacity:1;transform:translateY(0) rotate(var(--tilt))}}
+@keyframes stickPick{0%{transform:translateY(0) rotate(var(--tilt))}35%{transform:translateY(-54px) rotate(0deg) scale(1.08)}100%{transform:translateY(-28px) rotate(0deg) scale(1.04)}}
+@keyframes numberReveal{0%{opacity:0;transform:translate(-50%,20px) scale(.7)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
+
+.dart-game{display:grid;gap:20px}
+.dart-arena{position:relative;width:min(430px,90vw);aspect-ratio:1;margin:0 auto;display:grid;place-items:center}
+.dart-pointer{position:absolute;top:-2px;left:50%;transform:translateX(-50%);z-index:6;font-size:34px;filter:drop-shadow(0 7px 5px rgba(0,0,0,.12))}
+.dart-wheel{position:relative;width:88%;height:88%;border-radius:50%;overflow:hidden;border:10px solid #fff;box-shadow:0 15px 35px rgba(0,0,0,.15);background:#ddd;transition:transform 2.45s cubic-bezier(.15,.75,.15,1)}
+.dart-slice{position:absolute;inset:0;transform:rotate(calc(var(--i) * (360deg / var(--n))));clip-path:polygon(50% 50%,50% 0%,calc(50% + 49% * sin(360deg / var(--n))) calc(50% - 49% * cos(360deg / var(--n))),50% 50%);display:flex;align-items:flex-start;justify-content:center;background:var(--bg);padding-top:25px;font-weight:800}
+.dart-slice span{transform:rotate(calc(-1 * var(--i) * (360deg / var(--n))));max-width:100px;text-align:center}
+.dart-center{position:absolute;width:54px;height:54px;border-radius:50%;background:#fff;border:7px solid #222;z-index:3;box-shadow:0 5px 12px rgba(0,0,0,.16)}
+.dart{position:absolute;right:8%;bottom:9%;font-size:70px;z-index:7;transform:translate(180px,180px) rotate(-45deg);opacity:0}
+.dart-throw{animation:dartThrow 1.05s cubic-bezier(.2,.75,.2,1) forwards}
+.dart-status{text-align:center;font-weight:700;min-height:24px}
+@keyframes dartThrow{0%{opacity:0;transform:translate(180px,180px) rotate(-45deg) scale(.8)}18%{opacity:1;transform:translate(90px,100px) rotate(-25deg) scale(1)}65%{opacity:1;transform:translate(24px,22px) rotate(-8deg) scale(1.06)}100%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}}
+
+.team-shuffle-scene{min-height:330px;display:grid;place-items:center;position:relative;overflow:hidden;border-radius:20px;background:linear-gradient(180deg,#fafafa,#f0f3f7)}
+.shuffle-ring{position:relative;width:230px;height:230px;animation:ringSpin 1.45s ease-in-out}
+.shuffle-ring span{position:absolute;left:50%;top:50%;padding:8px 12px;background:#fff;border-radius:999px;box-shadow:0 8px 18px rgba(0,0,0,.1);font-size:.88rem;font-weight:700;transform:rotate(calc(var(--i) * 30deg)) translateY(-94px) rotate(calc(var(--i) * -30deg));animation:chipOrbit 1.15s ease-in-out}
+.shuffle-caption{position:absolute;bottom:28px;font-weight:700}
+@keyframes ringSpin{0%{transform:rotate(0) scale(.8)}60%{transform:rotate(440deg) scale(1.04)}100%{transform:rotate(720deg) scale(.9)}}
+@keyframes chipOrbit{0%{opacity:0;transform:rotate(calc(var(--i) * 30deg)) translateY(0) rotate(calc(var(--i) * -30deg)) scale(.6)}25%{opacity:1}100%{opacity:1;transform:rotate(calc(var(--i) * 30deg + 360deg)) translateY(-94px) rotate(calc(var(--i) * -30deg - 360deg)) scale(1)}}
+.team-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.team-card{opacity:0;transform:translateY(20px) scale(.96);padding:18px;border-radius:18px;background:#fff;border:1px solid #e8e8e8;box-shadow:0 10px 24px rgba(0,0,0,.06)}
+.team-card-show{animation:teamCardIn .5s ease-out var(--team-delay) forwards}
+.member-chip{opacity:0;transform:translateY(8px) scale(.92);display:inline-block;margin:5px 5px 0 0;padding:8px 12px;border-radius:999px;background:#f4f5f7;font-weight:700}
+.member-chip-show{animation:memberIn .45s ease-out var(--member-delay) forwards}
+@keyframes teamCardIn{to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes memberIn{to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes resultPop{0%{opacity:0;transform:scale(.7) translateY(12px)}70%{transform:scale(1.08)}100%{opacity:1;transform:scale(1) translateY(0)}}
+
+@media(max-width:700px){
+  .lottery-controls{grid-template-columns:1fr 1fr}
+  .lottery-controls .full-mobile{grid-column:1/-1}
+  .stick-board{justify-content:flex-start}
+  .dart-arena{width:min(350px,92vw)}
+  .coin-stage{min-height:300px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}

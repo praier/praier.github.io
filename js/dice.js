@@ -1,32 +1,54 @@
-const diceFace = n => ["","⚀","⚁","⚂","⚃","⚄","⚅"][n];
+(function(){
+  const countEl = document.getElementById('playerCount');
+  const button = document.getElementById('rollDice');
+  const board = document.getElementById('diceBoard');
+  if(!button || !board) return;
 
-document.addEventListener("DOMContentLoaded", () => {
-  const count = document.getElementById("playerCount");
-  const board = document.getElementById("diceBoard");
-  const rollBtn = document.getElementById("rollDice");
+  function rand(){ return Math.floor(Math.random()*6)+1; }
 
-  function renderPlayers() {
-    board.innerHTML = "";
-    for (let i = 1; i <= Number(count.value); i++) {
-      board.insertAdjacentHTML("beforeend",
-        `<div class="player"><div class="player-name">플레이어 ${i}</div><div class="die" data-player="${i}">⚄</div><div class="muted">아직 굴리지 않음</div></div>`
-      );
+  function renderBoard(count, rolling){
+    board.innerHTML = '';
+    for(let i=1;i<=count;i++){
+      const card = document.createElement('div');
+      card.className = 'dice-player-card' + (rolling ? ' is-rolling' : '');
+      card.dataset.player = i;
+      card.innerHTML = `
+        <div class="player-name">플레이어 ${i}</div>
+        <div class="dice-stage"><div class="dice-emoji">🎲</div></div>
+        <div class="dice-number">?</div>
+        <div class="dice-state">굴리는 중...</div>`;
+      board.appendChild(card);
     }
   }
-  count.addEventListener("change", renderPlayers);
-  renderPlayers();
 
-  rollBtn.addEventListener("click", () => {
-    const results = [];
-    board.querySelectorAll(".player").forEach((card, index) => {
-      const value = Math.floor(Math.random() * 6) + 1;
-      results.push({index, value});
-      card.querySelector(".die").textContent = diceFace(value);
-      card.querySelector(".muted").textContent = `${value}이 나왔습니다.`;
+  function showResults(results){
+    const high = Math.max(...results);
+    [...board.children].forEach((card, idx)=>{
+      const value = results[idx];
+      const num = card.querySelector('.dice-number');
+      const state = card.querySelector('.dice-state');
+      card.classList.remove('is-rolling');
+      card.classList.add('is-finished');
+      num.textContent = value;
+      state.textContent = value === high ? '🎉 최고 숫자!' : '결과 확인';
+      if(value === high) card.classList.add('is-winner');
     });
-    const max = Math.max(...results.map(r => r.value));
-    results.filter(r => r.value === max).forEach(r => {
-      board.children[r.index].querySelector(".muted").textContent = `${max} — 가장 높은 숫자`;
-    });
+  }
+
+  button.addEventListener('click', ()=>{
+    const count = Number(countEl.value) || 2;
+    const results = Array.from({length:count}, rand);
+    button.disabled = true;
+    button.textContent = '주사위가 구르는 중...';
+    renderBoard(count, true);
+    const duration = 1200;
+    setTimeout(()=>{
+      showResults(results);
+      button.disabled = false;
+      button.textContent = '다시 굴리기';
+    }, duration);
   });
-});
+
+  renderBoard(Number(countEl.value)||2, false);
+  countEl.addEventListener('change', ()=>renderBoard(Number(countEl.value)||2, false));
+})();

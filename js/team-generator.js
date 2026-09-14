@@ -1,28 +1,45 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const names = document.getElementById("names");
-  const teamCount = document.getElementById("teamCount");
-  const button = document.getElementById("makeTeams");
-  const result = document.getElementById("teamResult");
+(function(){
+  const namesEl=document.getElementById('names');
+  const teamCountEl=document.getElementById('teamCount');
+  const button=document.getElementById('makeTeams');
+  const result=document.getElementById('teamResult');
+  if(!namesEl||!teamCountEl||!button||!result) return;
 
-  button.addEventListener("click", () => {
-    const people = names.value.split(/\r?\n|,/).map(x => x.trim()).filter(Boolean);
-    const n = Number(teamCount.value);
-    if (people.length < 2) {
-      result.innerHTML = "<p>참가자를 2명 이상 입력해 주세요.</p>";
-      return;
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]]=[arr[j],arr[i]];
     }
-    if (!Number.isInteger(n) || n < 2 || n > people.length) {
-      result.innerHTML = "<p>팀 수를 참가자 수에 맞게 입력해 주세요.</p>";
-      return;
-    }
-    for (let i = people.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [people[i], people[j]] = [people[j], people[i]];
-    }
-    const teams = Array.from({length:n}, () => []);
-    people.forEach((person, i) => teams[i % n].push(person));
-    result.innerHTML = teams.map((team, i) =>
-      `<div class="team"><strong>${i+1}팀</strong><ul>${team.map(p => `<li>${p.replaceAll("<","&lt;")}</li>`).join("")}</ul></div>`
-    ).join("");
+    return arr;
+  }
+
+  function renderTeams(teams){
+    result.innerHTML='<div class="team-results">'+teams.map((team,i)=>`
+      <section class="team-card" style="--team-delay:${i*130}ms">
+        <h3>팀 ${i+1}</h3>
+        <div class="team-members">${team.map((name,j)=>`<div class="member-chip" style="--member-delay:${j*90}ms">${escapeHtml(name)}</div>`).join('')}</div>
+      </section>`).join('')+'</div>';
+    requestAnimationFrame(()=>{
+      result.querySelectorAll('.team-card').forEach(x=>x.classList.add('team-card-show'));
+      result.querySelectorAll('.member-chip').forEach(x=>x.classList.add('member-chip-show'));
+    });
+  }
+  function escapeHtml(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+  button.addEventListener('click',()=>{
+    const names=namesEl.value.split(/\n|,/).map(s=>s.trim()).filter(Boolean);
+    const teamCount=Number(teamCountEl.value)||2;
+    if(names.length<teamCount){ result.innerHTML='<p class="muted">팀 수보다 참가자가 많거나 같아야 합니다.</p>'; return; }
+    button.disabled=true;
+    button.textContent='섞는 중...';
+    result.innerHTML=`<div class="team-shuffle-scene"><div class="shuffle-ring">${names.slice(0,12).map((n,i)=>`<span style="--i:${i}">${escapeHtml(n)}</span>`).join('')}</div><div class="shuffle-caption">참가자를 섞고 있어요...</div></div>`;
+    const mixed=shuffle([...names]);
+    const teams=Array.from({length:teamCount},()=>[]);
+    mixed.forEach((name,i)=>teams[i%teamCount].push(name));
+    setTimeout(()=>{
+      renderTeams(teams);
+      button.disabled=false;
+      button.textContent='다시 팀 나누기';
+    },1500);
   });
-});
+})();
