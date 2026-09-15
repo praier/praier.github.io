@@ -62,12 +62,13 @@ function makeDie(value, index) {
     cube.append(side);
   }
   cube.style.transform = dieTransform(value);
+  cube.classList.add('settled');
+  cube.querySelector(`[data-face="${value}"]`).classList.add('current-face');
   view.append(cube); mover.append(view); slot.append(mover, make('span', 'die-label', `${index + 1}번 참가자`));
   return { slot, mover, cube, value };
 }
 let dice = [];
 function showDice(values) {
-  $('dice-visual').hidden = false;
   dice = values.map(makeDie); $('dice-visual').replaceChildren(...dice.map(d => d.slot));
   $('dice-visual').classList.toggle('many-dice', values.length > 3);
 }
@@ -76,9 +77,9 @@ if ($('roll')) {
   $('players').addEventListener('change', () => { showDice(Array.from({ length: Number($('players').value) }, (_, i) => i % 6 + 1)); $('result').textContent = '준비되면 주사위를 굴려주세요'; });
   $('roll').addEventListener('click', () => locked(async () => {
     const values = dice.map(() => randomInt(6) + 1);
-    $('dice-visual').hidden = false;
     $('result').textContent = '주사위가 구르는 중…';
     await Promise.all(dice.map(async (d, i) => {
+      d.cube.classList.remove('settled');
       const start = dieTransform(d.value), end = dieTransform(values[i], 3 + i % 2);
       d.cube.style.transform = end;
       await Promise.all([
@@ -92,8 +93,9 @@ if ($('roll')) {
         ], { duration: 1500 + i * 110, easing: 'ease-in-out' })
       ]);
       d.value = values[i]; d.cube.style.transform = dieTransform(values[i]);
+      d.cube.querySelectorAll('.die-face').forEach(face => face.classList.toggle('current-face', Number(face.dataset.face) === d.value));
+      d.cube.classList.add('settled');
     }));
-    $('dice-visual').hidden = true;
     $('result').replaceChildren(...values.map((n, i) => pill(`${i + 1}번 참가자 · ${n}`)));
   }));
 }
