@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://praier.github.io/sitemap.xml
+Sitemap: https://praier-random-tools.ansora73.chatgpt.site/sitemap.xml
